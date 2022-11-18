@@ -16,10 +16,10 @@ namespace Calculadora
         // var globais
         string resultado = "0", a, sinal;
         object tela;
-        int conta_operador = 0, cont_virgula = 0,b;
+        int conta_operador = 0, cont_virgula = 0, b;
         DataTable dt = new DataTable();
-        Boolean apertou_operador = true, igual_tem_valor = false, virgula_dpois = false, nao_pode_0 = false, primera_conta_dps_igual = false, erro = false;
-       
+        Boolean apertou_operador = true, igual_tem_valor = false, virgula_dpois = false, nao_pode_0 = false, primera_conta_dps_igual = false, erro = false, num_aposvirgula = false;
+
 
         public Form1()
         {
@@ -34,7 +34,7 @@ namespace Calculadora
                 cont_virgula += 1;
             }
         }
-       
+
         private void btm_fechar_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -52,6 +52,7 @@ namespace Calculadora
             resultado = "";
             conta_operador = 0;
             cont_virgula = 0;
+            num_aposvirgula = false;
             primera_conta_dps_igual = false;
             txb_screen.Font = new Font(Font.FontFamily, 48);
             txb_screen.BackColor = Color.White;
@@ -69,7 +70,6 @@ namespace Calculadora
                 virgula_dpois = true;
                 txb_auxiliar.Text = null;
                 igual_tem_valor = false;
-                virgula_dpois = false;
                 nao_pode_0 = false;
                 sinal = "";
                 resultado = "";
@@ -84,11 +84,22 @@ namespace Calculadora
             }
             else
             {
-                txb_screen.Text += botao.Text;
-                apertou_operador = true;
-                virgula_dpois = true;
-                
+                if (txb_screen.Text.Contains("."))
+                {
+                    txb_screen.Text += botao.Text;
+                    apertou_operador = true;
+                    virgula_dpois = true;
+                    num_aposvirgula = true;
+                }
+                else
+                {
+                    txb_screen.Text += botao.Text;
+                    apertou_operador = true;
+                    virgula_dpois = true;
+                }
+
             }
+
 
         }
         private void Operacao(object sender, EventArgs e)
@@ -96,104 +107,113 @@ namespace Calculadora
             System.Windows.Forms.Button operacao = (System.Windows.Forms.Button)sender;
             if (txb_screen.Text != "")
             {
-                if (apertou_operador == true)
+                if ((cont_virgula > 0 && num_aposvirgula == true) || (cont_virgula == 0))
                 {
-                    if (igual_tem_valor == true && primera_conta_dps_igual == false)
+                    if (apertou_operador == true)
                     {
-                        switch (operacao.Text)
+                        if (igual_tem_valor == true && primera_conta_dps_igual == false)
                         {
-                            case "+":
+                            switch (operacao.Text)
+                            {
+                                case "+":
 
-                                resultado = "("+ resultado+ ")" + "+";
-                                apertou_operador = false;
-                                sinal = "1";
-                                break;
-                            case "-":
+                                    resultado = "(" + resultado + ")" + "+";
+                                    apertou_operador = false;
+                                    sinal = "1";
+                                    break;
+                                case "-":
 
-                                resultado = "(" + resultado+ ")"+ "-";
-                                apertou_operador = false;
-                                sinal = "2";
-                                break;
-                            case "*": 
-                                resultado = "(" + resultado + ")"+ "*";
-                                apertou_operador = false;
-                                sinal = "3";
-                                break;
-                            case "/":
-                                resultado = "(" + resultado + ")"+ "/";
-                                apertou_operador = false;
-                                sinal = "4";
-                                break;
-                            
-
-                        }
-                        
-                        conta_operador += 1;
-                        cont_virgula = 0;
-                        primera_conta_dps_igual = true;
-                        txb_auxiliar.Text = resultado;
-                    }
-                    else
-                    {
-                        switch (operacao.Text)
-                        {
-                            case "+":
-                                a = txb_screen.Text;
-                                resultado = resultado + a + "+";
-                                apertou_operador = false;
-                                sinal = "1";
-                                break;
-                            case "-":
-                                a = txb_screen.Text;
-                                resultado += a + "-";
-                                apertou_operador = false;
-                                sinal = "2";
-                                break;
-                            case "*":
-                                a = txb_screen.Text;
-                                resultado += a + "*";
-                                apertou_operador = false;
-                                sinal = "3";
-                                break;
-                            case "/":
-                                if (txb_screen.Text == "0")
-                                {
-                                    nao_pode_0 = true;
-                                }
-                                else
-                                {
-                                    a = txb_screen.Text;
-                                    resultado += a + "/";
+                                    resultado = "(" + resultado + ")" + "-";
+                                    apertou_operador = false;
+                                    sinal = "2";
+                                    break;
+                                case "*":
+                                    resultado = "(" + resultado + ")" + "*";
+                                    apertou_operador = false;
+                                    sinal = "3";
+                                    break;
+                                case "/":
+                                    resultado = "(" + resultado + ")" + "/";
                                     apertou_operador = false;
                                     sinal = "4";
+                                    break;
 
-                                }
-                                break;
+
+                            }
+
+                            conta_operador += 1;
+                            cont_virgula = 0;
+                            primera_conta_dps_igual = true;
+                            txb_auxiliar.Text = resultado;
                         }
+                        else
+                        {
+                            switch (operacao.Text)
+                            {
+                                case "+":
+                                    a = txb_screen.Text;
+                                    resultado = resultado + a + "+";
+                                    apertou_operador = false;
+                                    sinal = "1";
+                                    break;
+                                case "-":
+                                    a = txb_screen.Text;
+                                    resultado += a + "-";
+                                    apertou_operador = false;
+                                    sinal = "2";
+                                    break;
+                                case "*":
+                                    a = txb_screen.Text;
+                                    resultado += a + "*";
+                                    apertou_operador = false;
+                                    sinal = "3";
+                                    break;
+                                case "/":
+                                    if (txb_screen.Text == "0")
+                                    {
+                                        nao_pode_0 = true;
+                                    }
+                                    else
+                                    {
+                                        a = txb_screen.Text;
+                                        resultado += a + "/";
+                                        apertou_operador = false;
+                                        sinal = "4";
+
+                                    }
+                                    break;
+                            }
+                        }
+                        txb_screen.Text = null;
+                        conta_operador += 1;
+                        cont_virgula = 0;
+                        txb_auxiliar.Text = resultado;
+                        num_aposvirgula = false;
                     }
-                    txb_screen.Text = null;
-                    conta_operador += 1;
-                    cont_virgula = 0;
-                    txb_auxiliar.Text = resultado;
                 }
-                
-            }
-            if (apertou_operador == false)
-            {
-                var n = txb_auxiliar.Text.ToArray();
 
-                n[n.Length - 1] = char.Parse(operacao.Text);
-                txb_auxiliar.Text = new string(n);
 
             }
+            
+                if (apertou_operador == false)
+                {
+                    var n = txb_auxiliar.Text.ToArray();
+
+                    n[n.Length - 1] = char.Parse(operacao.Text);
+                    txb_auxiliar.Text = new string(n);
+
+                }
+            
         }
 
         private void btm_igual_Click(object sender, EventArgs e)
         {
             if (txb_screen.Text != "")
             {
-                if (conta_operador > 0)
+                if ((cont_virgula > 0 && num_aposvirgula == true) || (cont_virgula == 0))
                 {
+                    if (conta_operador > 0)
+                    {
                         switch (sinal)
                         {
                             case "1":
@@ -220,7 +240,7 @@ namespace Calculadora
                                     txb_screen.BackColor = Color.White;
                                     nao_pode_0 = true;
                                     erro = true;
-                            }
+                                }
                                 else
                                 {
                                     a = txb_screen.Text;
@@ -235,6 +255,7 @@ namespace Calculadora
                             txb_screen.Text = tela.ToString();
                             txb_auxiliar.Text = resultado;
                             sinal = null;
+                            num_aposvirgula = false;
                             primera_conta_dps_igual = false;
                         }
                     }
@@ -242,5 +263,6 @@ namespace Calculadora
             }
         }
     }
+}
 
 
